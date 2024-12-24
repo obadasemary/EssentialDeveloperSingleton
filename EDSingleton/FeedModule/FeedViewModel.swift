@@ -6,13 +6,25 @@
 //
 
 
-class FeedViewModel {
+
+import Combine
+
+class FeedViewModel: ObservableObject {
     
-    var loadFeed: ((([FeedItem]) -> Void) -> Void)?
+    @Published var items: [String] = []
+    
+    let remoteWithLocalFallbackFeedLoader: RemoteWithLocalFallbackFeedLoader
+    
+    init(
+        remoteWithLocalFallbackFeedLoader: RemoteWithLocalFallbackFeedLoader
+    ) {
+        self.remoteWithLocalFallbackFeedLoader = remoteWithLocalFallbackFeedLoader
+    }
     
     func load() {
-        loadFeed? { loadedItems in
-            
+        remoteWithLocalFallbackFeedLoader.loadFeed { [weak self] loadedItems in
+            guard let self else { return }
+            items = loadedItems
         }
     }
 }
